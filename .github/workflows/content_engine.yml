@@ -1,0 +1,42 @@
+name: Agasobanuye Content Engine
+
+on:
+  workflow_dispatch: # Allows you to click the manual "Run workflow" button
+  schedule:
+    - cron: '0 * * * *' # Runs exactly once every hour (Video rendering is heavy, so hourly is safest!)
+
+jobs:
+  build-and-post:
+    runs-on: ubuntu-22.04 # We use 22.04 to prevent the libasound2 error we fixed earlier!
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # We use 3.10 to prevent the pkg_resources error!
+
+      - name: Install Video Engine (FFmpeg)
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright Browsers
+        run: playwright install chromium
+
+      - name: Run Content Engine
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AYRSHARE_API_KEY: ${{ secrets.AYRSHARE_API_KEY }}
+        run: python social_agent.py
+
+      - name: Save Memory (Commit & Push)
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add memory.json
+          git commit -m "Update memory.json" || exit 0
+          git push

@@ -14,7 +14,7 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from google import genai
 from moviepy.editor import ImageClip, CompositeVideoClip, ColorClip, AudioFileClip
-from gTTS import gTTS
+from gtts import gTTS
 
 # --- CONFIGURATION ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')

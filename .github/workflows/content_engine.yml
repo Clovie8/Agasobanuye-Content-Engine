@@ -42,3 +42,12 @@ jobs:
           git add memory.json
           git commit -m "Update memory.json" || exit 0
           git push
+
+
+      - name: Upload Debug Screenshot
+        if: always() # This ensures it uploads even if the script crashes
+        uses: actions/upload-artifact@v4
+        with:
+          name: headless-debug-view
+          path: debug_error.png
+          compression-level: 0

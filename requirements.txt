@@ -4,5 +4,5 @@ beautifulsoup4==4.12.3
 google-genai==0.3.0
 requests==2.31.0
 moviepy==1.0.3
-pillow==9.5.0
+pillow==10.2.0
 setuptools

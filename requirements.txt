@@ -6,3 +6,5 @@ requests==2.31.0
 moviepy==1.0.3
 pillow==10.2.0
 setuptools
+requests==2.31.0
+edge-tts==6.1.9

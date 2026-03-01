@@ -2,6 +2,12 @@ import os
 import json
 import logging
 import requests
+from PIL import Image
+
+# --- THE PILLOW 10 PATCH FOR MOVIEPY ---
+if not hasattr(Image, 'ANTIALIAS'):
+    Image.ANTIALIAS = Image.LANCZOS
+# ---------------------------------------
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from google import genai
@@ -28,6 +34,20 @@ def get_page_content(url, selector):
             # FIX 1: Wait for 'networkidle' instead of 'domcontentloaded'. 
             # This forces the bot to wait until all JavaScript and images finish loading!
             page.goto(url, wait_until="networkidle", timeout=60000)
+
+            # --- NEW: CLOSE THE WHATSAPP POPUP ---
+            try:
+                # Target the exact class of your specific WhatsApp widget close button
+                close_button = page.locator("button.wa-widget-close")
+                close_button.first.click(timeout=5000)
+                logging.info("🧹 Closed the WhatsApp community popup!")
+                
+                # Wait 1 second for the fade-out animation to finish so it isn't in the screenshot
+                page.wait_for_timeout(1000) 
+            except Exception:
+                # If the popup isn't there, just ignore it and move on!
+                pass
+            # --------------------------------------
             
             # Popup Assassin
             try:

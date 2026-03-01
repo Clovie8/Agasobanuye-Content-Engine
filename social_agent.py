@@ -25,7 +25,9 @@ def get_page_content(url, selector):
         page = browser.new_page()
         stealth_sync(page)
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            # FIX 1: Wait for 'networkidle' instead of 'domcontentloaded'. 
+            # This forces the bot to wait until all JavaScript and images finish loading!
+            page.goto(url, wait_until="networkidle", timeout=60000)
             
             # Popup Assassin
             try:
@@ -35,7 +37,8 @@ def get_page_content(url, selector):
             except Exception:
                 pass
 
-            page.wait_for_selector(selector, timeout=30000)
+            # FIX 2: Give it 45 seconds to find the selector just in case the server is slow
+            page.wait_for_selector(selector, timeout=45000)
             elements = page.query_selector_all(selector)
             extracted_text = "\n".join([el.inner_text() for el in elements])
             
@@ -46,10 +49,18 @@ def get_page_content(url, selector):
             return extracted_text
         except Exception as e:
             logging.error(f"❌ Scraping failed: {e}")
+            
+            # FIX 3: THE DEBUGGER. If it crashes, take a picture of the page so we can see why!
+            try:
+                page.screenshot(path="debug_error.png")
+                logging.info("📸 Saved a debug screenshot (debug_error.png).")
+            except:
+                pass
+                
             return None
         finally:
             browser.close()
-
+            
 def generate_seo_brain(new_text, content_type):
     """Uses Gemini 2.5 Flash to generate viral Kinyarwanda/English SEO content as JSON."""
     logging.info("🧠 Booting up Gemini Kinyarwanda SEO Brain...")

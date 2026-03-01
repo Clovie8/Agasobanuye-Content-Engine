@@ -14,6 +14,7 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from google import genai
 from moviepy.editor import ImageClip, CompositeVideoClip, ColorClip, AudioFileClip
+from gTTS import gTTS
 
 # --- CONFIGURATION ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -105,12 +106,12 @@ def generate_seo_brain(new_text, content_type):
         }
 
 def generate_ai_voiceover(script_text, output_filename="voice.mp3"):
-    """Uses Edge-TTS to generate a cinematic AI voice."""
-    logging.info("🎙️ Recording AI Voiceover...")
+    """Uses Google TTS to generate a reliable AI voice."""
+    logging.info("🎙️ Recording AI Voiceover via Google TTS...")
     try:
-        # en-US-ChristopherNeural is a deep, cinematic male voice
-        command = f'edge-tts --voice en-US-ChristopherNeural --text "{script_text}" --write-media {output_filename}'
-        subprocess.run(command, shell=True, check=True)
+        # tld='co.uk' gives it a British accent which sounds a bit more dramatic!
+        tts = gTTS(text=script_text, lang='en', tld='co.uk')
+        tts.save(output_filename)
         logging.info("✅ AI Voiceover recorded!")
         return output_filename
     except Exception as e:

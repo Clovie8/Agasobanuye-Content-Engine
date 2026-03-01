@@ -3,11 +3,11 @@ name: Agasobanuye Content Engine
 on:
   workflow_dispatch: # Allows you to click the manual "Run workflow" button
   schedule:
-    - cron: '0 * * * *' # Runs exactly once every hour (Video rendering is heavy, so hourly is safest!)
+    - cron: '0 * * * *' # Runs exactly once every hour to manage video rendering safely
 
 jobs:
   build-and-post:
-    runs-on: ubuntu-22.04 # We use 22.04 to prevent the libasound2 error we fixed earlier!
+    runs-on: ubuntu-22.04 # Locked to 22.04 to prevent libasound2 errors
 
     steps:
       - name: Checkout Repository
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # We use 3.10 to prevent the pkg_resources error!
+          python-version: '3.10' # Locked to 3.10 for Playwright stability
 
       - name: Install Video Engine (FFmpeg)
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
@@ -29,8 +29,10 @@ jobs:
 
       - name: Run Content Engine
         env:
+          # --- NEW TELEGRAM UPLINK SECRETS ---
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          AYRSHARE_API_KEY: ${{ secrets.AYRSHARE_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
         run: python social_agent.py
 
       - name: Save Memory (Commit & Push)
